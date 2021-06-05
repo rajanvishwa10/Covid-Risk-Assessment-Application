@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "112747052017",
+    "project_id": "covid-risk-assessment-e918b",
+    "storage_bucket": "covid-risk-assessment-e918b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:112747052017:android:4c305b389c266863cba250",
+        "android_client_info": {
+          "package_name": "com.android.covidriskassessmentapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "112747052017-tc9nd6fokbqgn036mi9o930ft1jrdesf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5MdT25UcKjJmFSoVt0ZpGlD-L8RtPEKo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "112747052017-tc9nd6fokbqgn036mi9o930ft1jrdesf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
