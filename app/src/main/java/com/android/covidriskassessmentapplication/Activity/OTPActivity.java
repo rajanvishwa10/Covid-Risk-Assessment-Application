@@ -1,4 +1,4 @@
-package com.android.covidriskassessmentapplication;
+package com.android.covidriskassessmentapplication.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,17 +10,14 @@ import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.android.covidriskassessmentapplication.R;
 import com.chaos.view.PinView;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.PhoneAuthCredential;
@@ -136,7 +133,7 @@ public class OTPActivity extends AppCompatActivity {
                                 progressLayout.setVisibility(View.GONE);
                                 successfulLayout.setVisibility(View.VISIBLE);
                                 new Handler().postDelayed(() -> {
-                                    Intent intent = new Intent(OTPActivity.this, MainActivity.class);
+                                    Intent intent = new Intent(OTPActivity.this, QuestionnaireActivity.class);
                                     startActivity(intent);
                                 }, 3000);
 

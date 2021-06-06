@@ -1,8 +1,10 @@
-package com.android.covidriskassessmentapplication;
+package com.android.covidriskassessmentapplication.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.android.covidriskassessmentapplication.R;
 
 public class MainActivity extends AppCompatActivity {
 
