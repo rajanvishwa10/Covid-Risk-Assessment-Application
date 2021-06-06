@@ -20,12 +20,12 @@ import java.util.List;
 
 public class QuestionnaireActivity extends AppCompatActivity {
 
-    private Button vaccineStatusButton, submit;
-    private RadioGroup radioGroup;
-    private boolean isClicked = true;
+    private Button vaccineStatusButton, submit, medical_conditions;
+    private RadioGroup radioGroup, radioGroup2;
+    private boolean isClicked = false, isClicked2 = false;
     private AutoCompleteTextView autoCompleteTextView;
-    private EditText fullNameEditText, age, medical;
-    int vaccine_status = 0;
+    private EditText fullNameEditText, age;
+    int vaccine_status = 0, conditions = 0;
     private List<String> cityModel;
     private ConstraintLayout constraintLayout;
 
@@ -51,6 +51,17 @@ public class QuestionnaireActivity extends AppCompatActivity {
                     break;
             }
         });
+
+        radioGroup2.setOnCheckedChangeListener((group, checkedId) -> {
+            switch (checkedId) {
+                case R.id.no:
+                    conditions = 0;
+                    break;
+                case R.id.yes:
+                    conditions = 1;
+                    break;
+            }
+        });
         submitData();
     }
 
@@ -58,15 +69,12 @@ public class QuestionnaireActivity extends AppCompatActivity {
     private void submitData() {
         submit.setOnClickListener(v -> {
             String name = fullNameEditText.getText().toString().trim();
-            String medical_condition = medical.getText().toString().trim();
             String city = autoCompleteTextView.getText().toString().trim();
 
             if (name.isEmpty()) {
                 Snackbar.make(constraintLayout, "Name can not be empty", Snackbar.LENGTH_SHORT).show();
             }  else if (!checkAge(age.getText().toString().trim())) {
                 Snackbar.make(constraintLayout, "Age should be above 18", Snackbar.LENGTH_SHORT).show();
-            } else if (medical_condition.isEmpty()) {
-                Snackbar.make(constraintLayout, "Medical Condition can not be empty", Snackbar.LENGTH_SHORT).show();
             } else if (city.isEmpty()) {
                 Snackbar.make(constraintLayout, "City can not be empty", Snackbar.LENGTH_SHORT).show();
             } else if (!checkCity(city)) {
@@ -109,17 +117,30 @@ public class QuestionnaireActivity extends AppCompatActivity {
                 isClicked = true;
             }
         });
+
+        medical_conditions.setOnClickListener(v -> {
+            if (isClicked2) {
+                radioGroup2.setVisibility(View.VISIBLE);
+                medical_conditions.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_baseline_arrow_drop_up_24, 0);
+                isClicked2 = false;
+            } else {
+                radioGroup2.setVisibility(View.GONE);
+                medical_conditions.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_baseline_arrow_drop_down_24, 0);
+                isClicked2 = true;
+            }
+        });
     }
 
     private void initViews() {
         vaccineStatusButton = findViewById(R.id.vaccineStatusButton);
+        medical_conditions = findViewById(R.id.medicalRadioGroup);
         submit = findViewById(R.id.submit);
         radioGroup = findViewById(R.id.radioGroup);
+        radioGroup2 = findViewById(R.id.radioGroup2);
         autoCompleteTextView = findViewById(R.id.cityAutoComplete);
 
         fullNameEditText = findViewById(R.id.fullNameEditText);
         age = findViewById(R.id.age);
-        medical = findViewById(R.id.medical);
 
         constraintLayout = findViewById(R.id.parent);
     }
