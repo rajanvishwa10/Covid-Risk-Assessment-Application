@@ -1,8 +1,10 @@
 package com.android.covidriskassessmentapplication.Activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -10,23 +12,32 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.android.covidriskassessmentapplication.R;
 import com.android.covidriskassessmentapplication.firebaseConfig.RemoteConfig;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class QuestionnaireActivity extends AppCompatActivity {
 
     private Button vaccineStatusButton, submit, medical_conditions;
     private RadioGroup radioGroup, radioGroup2;
-    private boolean isClicked = false, isClicked2 = false;
     private AutoCompleteTextView autoCompleteTextView;
     private EditText fullNameEditText, age;
     int vaccine_status = 0, conditions = 0;
     private List<String> cityModel;
+    private RelativeLayout progressLayout;
     private ConstraintLayout constraintLayout;
 
     @Override
@@ -35,7 +46,6 @@ public class QuestionnaireActivity extends AppCompatActivity {
         setContentView(R.layout.activity_questionaire);
 
         initViews();
-        setRadioGroup();
         remoteConfig();
 
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
@@ -73,16 +83,39 @@ public class QuestionnaireActivity extends AppCompatActivity {
 
             if (name.isEmpty()) {
                 Snackbar.make(constraintLayout, "Name can not be empty", Snackbar.LENGTH_SHORT).show();
-            }  else if (!checkAge(age.getText().toString().trim())) {
-                Snackbar.make(constraintLayout, "Age should be above 18", Snackbar.LENGTH_SHORT).show();
+            } else if (!checkAge(age.getText().toString().trim())) {
+                Snackbar.make(constraintLayout, "Age should be above 18 and below 80", Snackbar.LENGTH_SHORT).show();
             } else if (city.isEmpty()) {
                 Snackbar.make(constraintLayout, "City can not be empty", Snackbar.LENGTH_SHORT).show();
             } else if (!checkCity(city)) {
                 Snackbar.make(constraintLayout, "City is not in the list", Snackbar.LENGTH_SHORT).show();
             } else {
-                Snackbar.make(constraintLayout, "Thank you for sharing", Snackbar.LENGTH_SHORT).show();
+                progressLayout.setVisibility(View.VISIBLE);
+                addToDatabase(name, Integer.parseInt(age.getText().toString()), vaccine_status, conditions, city);
             }
 
+        });
+    }
+
+    private void addToDatabase(String name, int age, int vaccine_status, int conditions, String city) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference databaseReference = database.getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("name", name);
+        updates.put("age", age);
+        updates.put("vaccine_status", vaccine_status);
+        updates.put("medical_condition", conditions);
+        updates.put("city", city);
+
+        databaseReference.updateChildren(updates).addOnSuccessListener(aVoid -> {
+            progressLayout.setVisibility(View.GONE);
+            Snackbar.make(constraintLayout, "Thank you for sharing", Snackbar.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        }).addOnFailureListener(e -> {
+            progressLayout.setVisibility(View.GONE);
+            Snackbar.make(constraintLayout, "Error", Snackbar.LENGTH_SHORT).show();
         });
     }
 
@@ -91,7 +124,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
     }
 
     private boolean checkAge(String ageText) {
-        if(!ageText.isEmpty()){
+        if (!ageText.isEmpty()) {
             int age = Integer.parseInt(ageText);
             return age >= 18 && age < 80;
         }
@@ -100,36 +133,13 @@ public class QuestionnaireActivity extends AppCompatActivity {
 
     private void remoteConfig() {
         cityModel = RemoteConfig.getCityConfig(this).getCity();
+        List<String> city = new ArrayList<>();
+        city.add("Mumbai");
         ArrayAdapter<String> adapter = new ArrayAdapter<>
-                (this, android.R.layout.select_dialog_item, cityModel);
+                (this, android.R.layout.simple_list_item_1, city);
         autoCompleteTextView.setAdapter(adapter);
     }
 
-    private void setRadioGroup() {
-        vaccineStatusButton.setOnClickListener(v -> {
-            if (isClicked) {
-                radioGroup.setVisibility(View.VISIBLE);
-                vaccineStatusButton.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_baseline_arrow_drop_up_24, 0);
-                isClicked = false;
-            } else {
-                radioGroup.setVisibility(View.GONE);
-                vaccineStatusButton.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_baseline_arrow_drop_down_24, 0);
-                isClicked = true;
-            }
-        });
-
-        medical_conditions.setOnClickListener(v -> {
-            if (isClicked2) {
-                radioGroup2.setVisibility(View.VISIBLE);
-                medical_conditions.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_baseline_arrow_drop_up_24, 0);
-                isClicked2 = false;
-            } else {
-                radioGroup2.setVisibility(View.GONE);
-                medical_conditions.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_baseline_arrow_drop_down_24, 0);
-                isClicked2 = true;
-            }
-        });
-    }
 
     private void initViews() {
         vaccineStatusButton = findViewById(R.id.vaccineStatusButton);
@@ -138,6 +148,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         radioGroup = findViewById(R.id.radioGroup);
         radioGroup2 = findViewById(R.id.radioGroup2);
         autoCompleteTextView = findViewById(R.id.cityAutoComplete);
+        progressLayout = findViewById(R.id.rlProgressBar);
 
         fullNameEditText = findViewById(R.id.fullNameEditText);
         age = findViewById(R.id.age);

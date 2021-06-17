@@ -22,9 +22,9 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        mAuth= FirebaseAuth.getInstance();
-        if(mAuth.getCurrentUser()!=null){
-            Intent intent=new Intent(this,QuestionnaireActivity.class);
+        mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() != null) {
+            Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
         }
@@ -45,13 +45,13 @@ public class LoginActivity extends AppCompatActivity {
 
     public void sendOtp(View view) {
         String phone = editText.getText().toString().trim();
-        if(phone.isEmpty()){
+        if (phone.isEmpty()) {
             Toast.makeText(this, "Contact Number can not be empty", Toast.LENGTH_SHORT).show();
             Snackbar.make(constraintLayout, "Contact Number can not be empty", Snackbar.LENGTH_SHORT).show();
-        }else if(phone.length() < 10){
+        } else if (phone.length() < 10) {
             Toast.makeText(this, "Incorrect Contact Number", Toast.LENGTH_SHORT).show();
             Snackbar.make(constraintLayout, "Incorrect Contact Number", Snackbar.LENGTH_SHORT).show();
-        }else{
+        } else {
             Intent intent = new Intent(this, OTPActivity.class);
             intent.putExtra("phone", editText.getText().toString());
             startActivity(intent);

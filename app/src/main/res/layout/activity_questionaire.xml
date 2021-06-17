@@ -10,13 +10,19 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:theme="@style/Toolbar"
+        android:elevation="8dp"
+        android:background="@color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:title="Please Enter Details" />
 
+    <include layout="@layout/layout_progress_layout"
+        android:visibility="gone"/>
+
     <ScrollView
+        android:layout_marginTop="2dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
@@ -163,11 +169,12 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout6"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginHorizontal="10dp"
                 android:layout_marginTop="10dp"
+                app:endIconTint="@color/black"
                 app:boxStrokeColor="@color/black"
                 app:hintTextColor="@color/black"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -181,6 +188,7 @@
                     android:layout_marginTop="10dp"
                     android:hint="City"
                     android:paddingStart="15dp"
+                    android:inputType="none"
                     android:textSize="15sp"
                     android:theme="@style/MyEditTextTheme" />
             </com.google.android.material.textfield.TextInputLayout>
