@@ -2,15 +2,20 @@ package com.android.covidriskassessmentapplication.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -19,6 +24,7 @@ import android.widget.Toast;
 import com.android.covidriskassessmentapplication.R;
 import com.android.covidriskassessmentapplication.Util.CheckScore;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     int TOTAL_SCORE;
     Dialog dialog;
     private TextView stayHomeTV;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +87,9 @@ public class MainActivity extends AppCompatActivity {
         builder.setMessage("Be careful when out of home. Wear a clean and safe mask properly. Ensure you maintain physical distancing from others, avoid touching surfaces and avoid going into crowded non-venilated places. Places which follow all norms are called GAG - Good Adherence to Guidance and Places which do not follow norms fully are LAG, Low Adherence to Guidance");
         builder.setPositiveButton("I understand", (dialog, which) -> {
             dialog.dismiss();
-            scrollView.setVisibility(View.VISIBLE);
+            //scrollView.setVisibility(View.VISIBLE);
             stayHomeTV.setVisibility(View.GONE);
+            showVehicleDialog();
         });
         builder.setNegativeButton("I want to Stay Home", (dialog1, which) -> {
             dialog1.dismiss();
@@ -89,6 +97,36 @@ public class MainActivity extends AppCompatActivity {
             stayHomeTV.setVisibility(View.VISIBLE);
         });
         builder.create().show();
+    }
+
+    private void showVehicleDialog() {
+        dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_vehicle);
+        dialog.setCancelable(false);
+        Window window = dialog.getWindow();
+        window.getAttributes().windowAnimations = R.style.DialogAnimation;
+
+        CardView autoCv = window.findViewById(R.id.autoCv);
+        CardView busCv = window.findViewById(R.id.busCv);
+        Button button = window.findViewById(R.id.button);
+
+        autoCv.setOnClickListener(v -> {
+            showLaG_GAG_Dialog("auto", 15, 30);
+            dialog.dismiss();
+        });
+
+        busCv.setOnClickListener(v -> {
+            showTimeDialog(30, 60, -1, "bus");
+            dialog.dismiss();
+        });
+
+        button.setOnClickListener(v -> {
+            scrollView.setVisibility(View.VISIBLE);
+            dialog.dismiss();
+        });
+
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.show();
     }
 
     private void onClickListener() {
@@ -104,12 +142,12 @@ public class MainActivity extends AppCompatActivity {
         restaurantCv.setOnClickListener(v -> {
             showLaG_GAG_Dialog("restaurant", 60, 120);
         });
-        autoCv.setOnClickListener(v -> {
-            showLaG_GAG_Dialog("auto", 15, 30);
-        });
-        busCv.setOnClickListener(v -> {
-            showTimeDialog(30, 60, -1, "bus");
-        });
+//        autoCv.setOnClickListener(v -> {
+//            showLaG_GAG_Dialog("auto", 15, 30);
+//        });
+//        busCv.setOnClickListener(v -> {
+//            showTimeDialog(30, 60, -1, "bus");
+//        });
 
     }
 
@@ -136,22 +174,31 @@ public class MainActivity extends AppCompatActivity {
                 case "restaurant":
                     if (adherence == 0) {
                         score = TOTAL_SCORE + 3;
+                        Toast.makeText(this, "" + score, Toast.LENGTH_SHORT).show();
+
                     } else {
                         score = TOTAL_SCORE + 6;
+                        Toast.makeText(this, "" + score, Toast.LENGTH_SHORT).show();
+
                     }
                     showWarningDialog(score);
                     break;
                 case "auto":
                     if (adherence == 0) {
-                        score = TOTAL_SCORE + 2;
+                        TOTAL_SCORE = TOTAL_SCORE + 2;
                     } else {
-                        score = TOTAL_SCORE + 4;
+                        TOTAL_SCORE = TOTAL_SCORE + 4;
                     }
-                    showWarningDialog(score);
+                    scrollView.setVisibility(View.VISIBLE);
+                    Toast.makeText(this, "" + TOTAL_SCORE, Toast.LENGTH_SHORT).show();
+
+                    //showWarningDialog(score);
                     break;
                 case "bus":
-                    score = TOTAL_SCORE + 4;
-                    showWarningDialog(score);
+                    TOTAL_SCORE = TOTAL_SCORE + 4;
+                    scrollView.setVisibility(View.VISIBLE);
+                    Toast.makeText(this, "" + TOTAL_SCORE, Toast.LENGTH_SHORT).show();
+                    //showWarningDialog(score);
                     break;
                 case "grocery":
                     score = TOTAL_SCORE + 2;
@@ -174,19 +221,22 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         score = TOTAL_SCORE + 12;
                     }
+                    Toast.makeText(this, "" + score, Toast.LENGTH_SHORT).show();
                     showWarningDialog(score);
                     break;
                 case "auto":
                     if (adherence == 0) {
-                        score = TOTAL_SCORE + 6;
+                        TOTAL_SCORE = TOTAL_SCORE + 6;
                     } else {
-                        score = TOTAL_SCORE + 10;
+                        TOTAL_SCORE = TOTAL_SCORE + 10;
                     }
-                    showWarningDialog(score);
+                    scrollView.setVisibility(View.VISIBLE);
+//                    showWarningDialog(score);
                     break;
                 case "bus":
-                    score = TOTAL_SCORE + 8;
-                    showWarningDialog(score);
+                    TOTAL_SCORE = TOTAL_SCORE + 8;
+                    scrollView.setVisibility(View.VISIBLE);
+//                    showWarningDialog(score);
                     break;
                 case "grocery":
                     score = TOTAL_SCORE + 4;
@@ -207,10 +257,10 @@ public class MainActivity extends AppCompatActivity {
         Window window = dialog.getWindow();
 
         TextView textView = window.findViewById(R.id.textView);
-        if(score <= 11){
+        if (score <= 11) {
             textView.setText("Low probability of infection");
             textView.setTextColor(ContextCompat.getColor(window.getContext(), R.color.green_400));
-        }else{
+        } else {
             textView.setText("High probability of infection");
             textView.setTextColor(ContextCompat.getColor(window.getContext(), R.color.red_400));
         }
@@ -253,6 +303,8 @@ public class MainActivity extends AppCompatActivity {
         busCv = findViewById(R.id.busCv);
         scrollView = findViewById(R.id.scrollView);
         stayHomeTV = findViewById(R.id.stayHomeTv);
+        toolbar = findViewById(R.id.score);
+        toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
     }
 
     private void getData() {
@@ -283,4 +335,22 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.sign_out, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.signOut) {
+            FirebaseAuth.getInstance().signOut();
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finishAndRemoveTask();
+        }
+            return super.onOptionsItemSelected(item);
+
+    }
 }
